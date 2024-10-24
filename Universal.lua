@@ -1,13 +1,11 @@
---This watermark is used to delete the file if its cached, remove it to make the file persist after commits.
-local GetEnumItems = function() return {} end
-	GetEnumItems = function(enum)
-		local fonts = {}
-		for i,v in next, Enum[enum]:GetEnumItems() do 
-			table.insert(fonts, v.Name) 
-		end
-		return fonts
-	end
 local GuiLibrary = shared.GuiLibrary
+local function GetEnumItems(EnumType)
+	local items = {}
+	for i,v in pairs(Enum[EnumType]:GetEnumItems()) do
+		table.insert(items, v.Name)
+	end
+	return items
+end
 local playersService = game:GetService("Players")
 local coreGui = game:GetService("CoreGui")
 local textService = game:GetService("TextService")
@@ -60,7 +58,7 @@ end
 
 local function vapeGithubRequest(scripturl)
 	if not isfile("vape/"..scripturl) then
-		local suc, res = pcall(function() return game:HttpGet("https://raw.githubusercontent.com/7GrandDadPGN/VapeV4ForRoblox/"..readfile("vape/commithash.txt").."/"..scripturl, true) end)
+		local suc, res = pcall(function() return game:HttpGet("https://raw.githubusercontent.com/AbyssForRoblox/Abyss/"..readfile("vape/commithash.txt").."/"..scripturl, true) end)
 		assert(suc, res)
 		assert(res ~= "404: Not Found", res)
 		if scripturl:find(".lua") then res = "--This watermark is used to delete the file if its cached, remove it to make the file persist after commits.\n"..res end
