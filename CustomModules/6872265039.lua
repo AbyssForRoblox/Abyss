@@ -79,7 +79,7 @@ local function GetURL(scripturl)
 	if shared.VapeDeveloper then
 		return readfile("vape/"..scripturl)
 	else
-		return game:HttpGet("https://raw.githubusercontent.com/7GrandDadPGN/VapeV4ForRoblox/main/"..scripturl, true)
+		return game:HttpGet("https://raw.githubusercontent.com/AbyssForRoblox/Abyss/main/"..scripturl, true) -- dick licker 5000
 	end
 end
 
@@ -150,14 +150,6 @@ end
 local function runcode(func)
 	func()
 end
-local function run(func)
-	func()
-end
-local function runFunction(func)
-	func()
-end
-
-
 
 local function betterfind(tab, obj)
 	for i,v in pairs(tab) do
@@ -199,7 +191,7 @@ local function getcustomassetfunc(path)
 			textlabel:Remove()
 		end)
 		local req = requestfunc({
-			Url = "https://raw.githubusercontent.com/7GrandDadPGN/VapeV4ForRoblox/main/"..path:gsub("vape/assets", "assets"),
+			Url = "https://raw.githubusercontent.com/AbyssForRoblox/Abyss/main/"..path:gsub("vape/assets", "assets"),
 			Method = "GET"
 		})
 		writefile(path, req.Body)
@@ -1290,44 +1282,58 @@ runcode(function()
 		end
 	})
 end)
-run(function()
-	local AutoCrate = {Enabled = false}
-	local aut = 0
-	
-	AutoCrate = utility.Api.CreateOptionsButton({
-		Name = "AutoCrate",
-		HovorText = "Automatically open crates if you have any.",
-		Function = function(callback)
-			if callback then
-				RunLoops:BindToStepped("crate",1,function()
-					aut = aut + 1
-					if aut >= 45 then
-						local args = {
-							[1] = {
-								["crateType"] = "level_up_crate",
-								["altarId"] = 0
-							}
-						}
-						
-						game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("RewardCrate/SpawnRewardCrate"):FireServer(unpack(args))
-						
-						local args2 = {
-							[1] = {
-								["crateId"] = tostring(game.Workspace.CrateAltar_0:FindFirstChild("RewardCrate"):GetAttribute("crateId"))
-							}
-						}
-						
-						game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("RewardCrate/OpenRewardCrate"):FireServer(unpack(args2))
-						aut = 0
-					end
-				end)
-			else
-				RunLoops:UnbindFromStepped("crate")
-			end
-		end
-	})
-end)
+runcode(function()
+    local AutoCrate = {Enabled = false}
+    local crateOpenInterval = 45
+    local crateCounter = 0
 
+    local function spawnAndOpenCrate()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local remoteFolder = ReplicatedStorage:WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged")
+        
+        local spawnArgs = {
+            [1] = {
+                crateType = "level_up_crate",
+                altarId = 0
+            }
+        }
+        remoteFolder:WaitForChild("RewardCrate/SpawnRewardCrate"):FireServer(unpack(spawnArgs))
+        
+        local crateAltar = game.Workspace:WaitForChild("CrateAltar_0")
+        local rewardCrate = crateAltar:WaitForChild("RewardCrate", 2)
+        if rewardCrate then
+            local openArgs = {
+                [1] = {
+                    crateId = tostring(rewardCrate:GetAttribute("crateId"))
+                }
+            }
+            remoteFolder:WaitForChild("RewardCrate/OpenRewardCrate"):FireServer(unpack(openArgs))
+        else
+            warn("Failed to find RewardCrate")
+        end
+    end
+
+    local function onSteppedFunction()
+        crateCounter = crateCounter + 1
+        if crateCounter >= crateOpenInterval then
+            spawnAndOpenCrate()
+            crateCounter = 0
+        end
+    end
+
+    AutoCrate = utility.Api.CreateOptionsButton({
+        Name = "AutoCrate",
+        HovorText = "Automatically open crates if you have any.",
+        Function = function(callback)
+            if callback then
+                RunLoops:BindToStepped("AutoCrate", 1, onSteppedFunction)
+            else
+                RunLoops:UnbindFromStepped("AutoCrate")
+                crateCounter = 0
+            end
+        end
+    })
+end)
 
 runcode(function()
 	local tpstring = shared.vapeoverlay or nil
@@ -1519,20 +1525,20 @@ task.spawn(function()
 		pcall(function()
 			if not isfile("vape/Profiles/bedwarsdata.txt") then
 				local commit = "main"
-				for i,v in pairs(game:HttpGet("https://github.com/7GrandDadPGN/VapeV4ForRoblox"):split("\n")) do
+				for i,v in pairs(game:HttpGet("https://github.com/AbyssForRoblox/Abyss"):split("\n")) do
 					if v:find("commit") and v:find("fragment") then
 						local str = v:split("/")[5]
 						commit = str:sub(0, str:find('"') - 1)
 						break
 					end
 				end
-				writefile("vape/Profiles/bedwarsdata.txt", game:HttpGet("https://raw.githubusercontent.com/7GrandDadPGN/VapeV4ForRoblox/"..commit.."/CustomModules/bedwarsdata", true))
+				writefile("vape/Profiles/bedwarsdata.txt", game:HttpGet("https://raw.githubusercontent.com/AbyssForRoblox/Abyss/"..commit.."/CustomModules/bedwarsdata", true))
 			end
 			local olddata = readfile("vape/Profiles/bedwarsdata.txt")
 
 			repeat
 				local commit = "main"
-				for i,v in pairs(game:HttpGet("https://github.com/7GrandDadPGN/VapeV4ForRoblox"):split("\n")) do
+				for i,v in pairs(game:HttpGet("https://github.com/AbyssForRoblox/Abyss"):split("\n")) do
 					if v:find("commit") and v:find("fragment") then
 						local str = v:split("/")[5]
 						commit = str:sub(0, str:find('"') - 1)
@@ -1540,7 +1546,7 @@ task.spawn(function()
 					end
 				end
 
-				local newdata = game:HttpGet("https://raw.githubusercontent.com/7GrandDadPGN/VapeV4ForRoblox/"..commit.."/CustomModules/bedwarsdata", true)
+				local newdata = game:HttpGet("https://raw.githubusercontent.com/AbyssForRoblox/Abyss/"..commit.."/CustomModules/bedwarsdata", true)
 				if newdata ~= olddata then
 					rundata(game:GetService("HttpService"):JSONDecode(newdata), game:GetService("HttpService"):JSONDecode(olddata))
 					olddata = newdata
