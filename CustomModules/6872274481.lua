@@ -111,7 +111,7 @@ end
 
 local function vapeGithubRequest(scripturl)
 	if not isfile("vape/"..scripturl) then
-		local suc, res = pcall(function() return game:HttpGet("https://raw.githubusercontent.com/7GrandDadPGN/VapeV4ForRoblox/"..readfile("vape/commithash.txt").."/"..scripturl, true) end)
+		local suc, res = pcall(function() return game:HttpGet("https://raw.githubusercontent.com/AbyssForRoblox/Abyss/"..readfile("vape/commithash.txt").."/"..scripturl, true) end)
 		assert(suc, res)
 		assert(res ~= "404: Not Found", res)
 		if scripturl:find(".lua") then res = "--This watermark is used to delete the file if its cached, remove it to make the file persist after commits.\n"..res end
@@ -9482,49 +9482,45 @@ run(function()
 		end
 	end)         
 end)
-
-
-
-
-
-
 run(function()
     local AutoUpgradeStats = {Enabled = false}
     local replicatedStorage = game:GetService("ReplicatedStorage")
     local netManaged = replicatedStorage.rbxts_include.node_modules:FindFirstChild("@rbxts").net.out._NetManaged
 
+    local UPGRADES = {
+        {"SPEED", 1}, {"SPEED", 2}, {"SPEED", 3},
+        {"DAMAGE", 1}, {"DAMAGE", 2}, {"DAMAGE", 3},
+        {"ARMOR", 1}, {"ARMOR", 2}, {"ARMOR", 3},
+        {"DESTRUCTION", 1}, {"DESTRUCTION", 2}, {"DESTRUCTION", 3}
+    }
+
+    local TEAM_LEVELS = {3, 6, 5, 4, 7, 8, 9, 10, 11, 1, 2, 12, 13, 14, 15, 16, 17, 18, 19, 20}
+
+    local function upgradeLoop()
+        while AutoUpgradeStats.Enabled do
+            for _, upgrade in ipairs(UPGRADES) do
+                netManaged.RequestUpgradeStat:InvokeServer(unpack(upgrade))
+            end
+
+            for _, level in ipairs(TEAM_LEVELS) do
+                netManaged.RequestPurchaseTeamLevel:InvokeServer(level)
+            end
+
+            task.wait(0.1)
+        end
+    end
+
     AutoUpgradeStats = utility.Api.CreateOptionsButton({
         Name = "AutoUpgradeStats",
         Function = function(callback)
-            if callback then                                                                                                                                                            
-                local promoment = {
-                    {"SPEED", 1}, {"SPEED", 2}, {"SPEED", 3},
-                    {"DAMAGE", 1}, {"DAMAGE", 2}, {"DAMAGE", 3},
-                    {"ARMOR", 1}, {"ARMOR", 2}, {"ARMOR", 3},
-                    {"DESTRUCTION", 1}, {"DESTRUCTION", 2}, {"DESTRUCTION", 3}
-                }
-                local levels = {3, 6, 5, 4, 7, 8, 9, 10, 11, 1, 2, 12, 13, 14, 15, 16, 17, 18, 19, 20}
-                task.spawn(function()
-                    repeat
-                        for _, upgrade in ipairs(promoment) do
-                            netManaged.RequestUpgradeStat:InvokeServer(unpack(upgrade))
-                        end
-    
-                        for _, level in ipairs(levels) do
-                            netManaged.RequestPurchaseTeamLevel:InvokeServer(level)
-                        end
-    
-                        wait(0.1)
-                    until (not AutoUpgradeStats.Enabled)
-                end)   
+            AutoUpgradeStats.Enabled = callback
+            if callback then
+                task.spawn(upgradeLoop)
             end
         end,
         HoverText = "pro moment eeeeajjsjskekssk"
     })
-end)
-
-
-
+end)																																																																																																																																																																																																																	
 
 run(function()
 	local HotbarMods = {}
@@ -9805,28 +9801,25 @@ run(function()
                             end
                         end
                     end
-                    local function setupImpossibleJoinCheck()
-                        game.Players.PlayerAdded:Connect(checkImpossibleJoin)
-                    end
-                    setupImpossibleJoinCheck()
+                    
+                    game.Players.PlayerAdded:Connect(checkImpossibleJoin)
                 end
             end
         end
     })
-    
+
     Action = promomeng.CreateDropdown({
         Name = "Action",
         Function = function() end,
         List = {"Uninject", "Leave", "Crash"}
     })
-    
+
     Detection = promomeng.CreateDropdown({
         Name = "Detection Mode",
         Function = function() end,
         List = {"Impossible Join"}
     })
 end)
-
 run(function()
     local TweenService = game:GetService("TweenService")
     local collectionService = game:GetService("CollectionService")
@@ -10007,13 +10000,12 @@ run(function()
 				PlayerTp["ToggleButton"](false)
 			end
 		end,
-		["HoverText"] = "Teleports you to the closest player that is not on your team (BETA)"
+		HoverText = "Teleports you to the closest player that is not on your team (BETA)"
 	})
 end)
 
 run(function()
     local BringEveryone = {Enabled = false}
-    local PlaceIdPicker = {Value = "Squads/5v5/Doubles/Skywars"}
     BringEveryone = exploit.Api.CreateOptionsButton({
         Name = "InstantWin",
         HoverText = "Brings everyone to your custom-match and instantly wins in a public game",
@@ -10022,28 +10014,13 @@ run(function()
                 pcall(function()
                     local TeleportService = game:GetService("TeleportService")
                     local e2 = TeleportService:GetLocalPlayerTeleportData()
-                    local e = game.placeId
-
-                    if PlaceIdPicker.Value == "Squads/5v5/Doubles/Skywars" then
-                        game:GetService("TeleportService"):Teleport(6872274481, game.Players.LocalPlayer, e2)
-                    elseif PlaceIdPicker.Value == "30v30" then
-                        game:GetService("TeleportService"):Teleport(8444591321, game.Players.LocalPlayer, e2)
-                    elseif PlaceIdPicker.Value == "Solos" then
-                        game:GetService("TeleportService"):Teleport(8560631822, game.Players.LocalPlayer, e2)
-                    end
+                    TeleportService:Teleport(game.PlaceId, game.Players.LocalPlayer, e2)
                     BringEveryone.ToggleButton(false)
                 end)
             end
         end
     })
-    PlaceIdPicker = BringEveryone.CreateDropdown({
-        Name = "GameMode",
-        List = {"Squads/5v5/Doubles/Skywars", "30v30", "Solos"},
-        Function = function() end
-    })
 end)
-
-
 
 
 run(function() 
@@ -10100,40 +10077,7 @@ run(function()
 end)
 																																																																																																																																																																																																																			
 
-run(function()
-    local FourEXploit = {Enabled = false}
 
-    FourEXploit = exploit.Api.CreateOptionsButton({
-        Name = "autobuy wool",
-        Function = function(callback)
-            if callback then 
-                FourEXploit.Enabled = true
-                task.spawn(function()
-                    repeat 
-                        local args = {
-                            [1] = {
-                                ["shopItem"] = {
-                                    ["currency"] = "iron",
-                                    ["itemType"] = "wool_white",
-                                    ["amount"] = 16,
-                                    ["price"] = 8,
-                                    ["category"] = "Blocks"
-                                },
-                                ["shopId"] = "1_item_shop"
-                            }
-                        }
-
-                        game:GetService("ReplicatedStorage").rbxts_include.node_modules:FindFirstChild("@rbxts").net.out._NetManaged.BedwarsPurchaseItem:InvokeServer(unpack(args))
-                        
-                        task.wait(0.1)
-                    until (not FourEXploit.Enabled)
-                end)
-            else
-                FourEXploit.Enabled = false
-            end
-        end
-    })
-end)
 run(function()
     local charoutlinecolor = Color3.new(1, 1, 1)
     local outline = Instance.new('Highlight', GuiLibrary.MainGui)
@@ -10410,7 +10354,7 @@ Aquaripack = visual.Api.CreateOptionsButton({
             end)
         end
     end,
-    ["HoverText"] = "A sexy pack"
+    HoverText = "A sexy pack"
 })
 run(function()
 	local QueueCardMods = {}
@@ -10521,60 +10465,17 @@ run(function()
 	})
 end)
 
---[[run(function()
-    local ScytheExploit = {Enabled = false}
-    ScytheExploit = exploit.Api.CreateOptionsButton({
-        Name = "accidentally disabled MOST of the float check",
-        Function = function(callback)
-            if callback then
-                local player = game.Players.LocalPlayer
-                local character = player.Character or player.CharacterAdded:Wait()
-                local humanoid = character:WaitForChild("Humanoid")
 
-                local fakeDeathEvent = Instance.new("BindableEvent")
-                fakeDeathEvent.Name = "FakeDeathEvent"
-                fakeDeathEvent.Parent = humanoid
-
-                local function fakeDeath()
-                    humanoid.PlatformStand = true
-                    humanoid:ChangeState(Enum.HumanoidStateType.Physics)
-                    
-                    for _, part in ipairs(character:GetChildren()) do
-                        if part:IsA("BasePart") and part ~= humanoid.RootPart then
-                            part.CanCollide = true
-                            part.Anchored = false
-                            part.Velocity = Vector3.new(math.random(-10, 10), math.random(-10, 10), math.random(-10, 10))
-                        end
-                    end
-                    
-                    fakeDeathEvent:Fire()
-                end
-
-                fakeDeathEvent.Event:Connect(function()
-                end)
-
-                task.spawn(function()
-                    repeat
-                        fakeDeath()
-                        task.wait(0.1)
-                    until not ScytheExploit.Enabled
-                end)
-            else
-                ScytheExploit.Enabled = false
-            end
-        end
-    })
-end)]]
 run(function()
-    local HackerDetector = { Enabled = false }
-    local refreshFrequency = { Value = 0 }
-    local notifyDuration = { Value = 15 }
-    local ageCheck = { Value = 10 }
-    local speedACheck = { Enabled = false }
-    local speedBCheck = { Enabled = false }
-    local flyACheck = { Enabled = false }
-    local flyBCheck = { Enabled = false }
-    local altCheck = { Enabled = false }
+    local HackerDetector = {Enabled = false }
+    local refreshFrequency = {Value = 0 }
+    local notifyDuration = {Value = 15 }
+    local ageCheck = {Value = 10 }
+    local speedACheck = {Enabled = false }
+    local speedBCheck = {Enabled = false }
+    local flyACheck = {Enabled = false }
+    local flyBCheck = {Enabled = false }
+    local altCheck = {Enabled = false }
     local detected = {}
     local deathTPCheck = {}
     local players = {}
@@ -10677,7 +10578,7 @@ run(function()
         end)
     end
 
-    HackerDetector = GuiLibrary["ObjectsThatCanBeSaved"]["UtilityWindow"]["Api"]["CreateOptionsButton"]({
+    HackerDetector = utility.Api.CreateOptionsButton({
         Name = 'HackerDetector',
         HoverText = 'Detects blatant cheaters',
         Function = function(callback)
@@ -10693,7 +10594,7 @@ run(function()
         end
     })
 
-    refreshFrequency = HackerDetector["CreateSlider"]({
+    refreshFrequency = HackerDetector.CreateSlider({
         Name = "Check Cooldown",
         HoverText = "Sets how often the checks run (except DeathTP)",
         Min = 0,
@@ -10702,7 +10603,7 @@ run(function()
         Function = function() end
     })
 
-    notifyDuration = HackerDetector["CreateSlider"]({
+    notifyDuration = HackerDetector.CreateSlider({
         Name = "Duration",
         HoverText = "Duration of the notification",
         Min = 0,
@@ -10711,7 +10612,7 @@ run(function()
         Function = function() end
     })
 
-    ageCheck = HackerDetector["CreateSlider"]({
+    ageCheck = HackerDetector.CreateSlider({
         Name = "Age Check",
         HoverText = "Age to detect alt accounts",
         Min = 0,
@@ -10720,31 +10621,31 @@ run(function()
         Function = function() end
     })
 
-    speedACheck = HackerDetector["CreateToggle"]({
+    speedACheck = HackerDetector.CreateToggle({
         Name = "Disabler",
         Default = true,
         Function = function() end
     })
 
-    speedBCheck = HackerDetector["CreateToggle"]({
+    speedBCheck = HackerDetector.CreateToggle({
         Name = "DeathTP",
         Default = true,
         Function = function() end
     })
 
-    flyACheck = HackerDetector["CreateToggle"]({
+    flyACheck = HackerDetector.CreateToggle({
         Name = "Flight",
         Default = true,
         Function = function() end
     })
 
-    flyBCheck = HackerDetector["CreateToggle"]({
+    flyBCheck = HackerDetector.CreateToggle({
         Name = "Infinite Flight",
         Default = true,
         Function = function() end
     })
 
-    altCheck = HackerDetector["CreateToggle"]({
+    altCheck = HackerDetector.CreateToggle({
         Name = "AltDetector",
         Default = true,
         Function = function() end
@@ -10850,35 +10751,30 @@ run(function()
     })
 end)
 run(function()
-    local bypass = exploit.Api.CreateOptionsButton({ 
+    local bypass = exploit.Api.CreateOptionsButton({
         Name = "TPFastJump",
-        HoverText = "Makes player jump",    
-        Function = function(calling) 
+        HoverText = "Makes player jump",
+        Function = function(calling)
             if calling then
                 local player = game.Players.LocalPlayer
                 if player and player.Character then
-                    if JumpMode.Value == "CFrame" then
-                        local jumpDistance = 1000
-                        local humanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
+                    local humanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
+                    local primaryPart = player.Character.PrimaryPart
+
+                    if JumpMode.Value == "CFrame" or JumpMode.Value == "Double CFrame" then
+                        local jumpDistance = JumpMode.Value == "CFrame" and 1000 or 2000
                         if humanoidRootPart then
                             humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position + Vector3.new(0, jumpDistance, 0))
                         end
                     elseif JumpMode.Value == "Velocity" then
                         local jumpHeight = 1500
-                        local primaryPart = player.Character.PrimaryPart
                         if primaryPart then
                             primaryPart.Velocity = Vector3.new(0, jumpHeight, 0)
                         end
-                    elseif JumpMode.Value == "Double CFrame" then
-                        local jumpDistance = 2000
-                        local humanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
-                        if humanoidRootPart then
-                            humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position + Vector3.new(0, jumpDistance, 0))
-                        end
                     elseif JumpMode.Value == "Tween" then
                         local tweenService = game:GetService("TweenService")
-                        local tween = tweenService:Create(player.Character.HumanoidRootPart, TweenInfo.new(0.49, Enum.EasingStyle.Linear), {
-                            CFrame = player.Character.PrimaryPart.CFrame + Vector3.new(0, Bypasstween.Value, 0)
+                        local tween = tweenService:Create(humanoidRootPart, TweenInfo.new(0.49, Enum.EasingStyle.Linear), {
+                            CFrame = primaryPart.CFrame + Vector3.new(0, Bypasstween.Value, 0)
                         })
                         tween:Play()
                     end
@@ -10887,19 +10783,14 @@ run(function()
         end
     })
 
-    JumpMode = bypass["CreateDropdown"]({
+    local JumpMode = bypass.CreateDropdown({
         Name = "Mode",
-        List = {
-            "Velocity",
-            "CFrame",
-            "Double CFrame",
-            "Tween"
-        },
+        List = {"Velocity", "CFrame", "Double CFrame", "Tween"},
         HoverText = "Mode to jump.",
         Function = function() end,
     })
 
-    Bypasstween = bypass["CreateSlider"]({
+    local Bypasstween = bypass.CreateSlider({
         Name = "Tween Value",
         Min = 1,
         Max = 750,
@@ -10908,65 +10799,62 @@ run(function()
     })
 end)
 run(function()
-local FlyBoost = exploit.Api.CreateOptionsButton({
-Name = "BetterFly",
-HoverText = "A fly boost",
-Function = function(calling)
-if calling then
-local player = game.Players.LocalPlayer
-if player and player.Character then
-  if BoostMode.Value == "CFrame" then
+    local FlyBoost = exploit.Api.CreateOptionsButton({
+        Name = "BetterFly",
+        HoverText = "A fly boost",
+        Function = function(calling)
+            if calling then
+                local player = game.Players.LocalPlayer
+                if player and player.Character then
+                    local humanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
+                    local primaryPart = player.Character.PrimaryPart
+
+                    if BoostMode.Value == "CFrame" or BoostMode.Value == "Double CFrame" then
                         local jumpDistance = BoostHeight.Value
-                        local humanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
                         if humanoidRootPart then
                             humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position + Vector3.new(0, jumpDistance, 0))
                         end
                     elseif BoostMode.Value == "Velocity" then
                         local jumpHeight = BoostHeight.Value
-                        local primaryPart = player.Character.PrimaryPart
                         if primaryPart then
                             primaryPart.Velocity = Vector3.new(0, jumpHeight, 0)
                         end
-                    elseif BoostMode.Value == "Double CFrame" then
-                        local jumpDistance = BoostHeight.Value
-                        local humanoidRootPart = player.Character:FindFirstChild("HumanoidRootPart")
-                        if humanoidRootPart then
-                            humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position + Vector3.new(0, jumpDistance, 0))
-                        end
                     elseif BoostMode.Value == "Tween" then
                         local tweenService = game:GetService("TweenService")
-                        local tween = tweenService:Create(player.Character.HumanoidRootPart, TweenInfo.new(0.49, Enum.EasingStyle.Linear), {
-                            CFrame = player.Character.PrimaryPart.CFrame + Vector3.new(0, TweenValue.Value, 0)
+                        local tween = tweenService:Create(humanoidRootPart, TweenInfo.new(0.49, Enum.EasingStyle.Linear), {
+                            CFrame = primaryPart.CFrame + Vector3.new(0, TweenValue.Value, 0)
                         })
                         tween:Play()
                     end
                 end
             end
         end
-})
-BoostMode = FlyBoost.CreateDropdown({
+    })
+
+    local BoostMode = FlyBoost.CreateDropdown({
         Name = "Mode",
         Function = function() end,
         List = {"Tween", "CFrame", "Double CFrame", "Velocity"}
     })
-    TweenValue = FlyBoost.CreateSlider({
-		Name = "Tween Height",
-		Min = 1,
-		Max = 2000,
-		Function = function(val) end,
-		Default = 2000
-	})
-  BoostHeight = FlyBoost.CreateSlider({
-            Name = "Boost Height (studs)",
-            Min = 1,
-            Max = 2000,
-            Default = 2000,
-            Function = function(value)
-                BoostHeight.Value = value
-            end
-        })
-    end)
 
+    local TweenValue = FlyBoost.CreateSlider({
+        Name = "Tween Height",
+        Min = 1,
+        Max = 2000,
+        Function = function(val) end,
+        Default = 2000
+    })
+
+    local BoostHeight = FlyBoost.CreateSlider({
+        Name = "Boost Height (studs)",
+        Min = 1,
+        Max = 2000,
+        Default = 2000,
+        Function = function(value)
+            BoostHeight.Value = value
+        end
+    })
+end)
 --[[run(function()
 	local function getfontenums()
 		local fonts = {}
@@ -11432,411 +11320,224 @@ run(function()
 	HealthbarGradientColor.Object.Visible = false
 end)
 
-local function getNotificationMessage(messagesList, defaultMessage, replaceTag, replaceValue)
-    local message = #messagesList > 0 and messagesList[math.random(1, #messagesList)] or defaultMessage
-    return message:gsub(replaceTag, replaceValue)
-end
-
-local function handleBedBreakEvent(bedTable, lplr, BedBreakMessage)
-    if bedTable.brokenBedTeam.id == lplr:GetAttribute("Team") then
-        warningNotification("Bed", "Your bed has been destroyed by " .. (bedTable.player.DisplayName or bedTable.player.Name) .. "! Be careful.", 7)
-    elseif bedTable.player.UserId == lplr.UserId then
-        local team = bedwars.QueueMeta[bedwarsStore.queueType].teams[tonumber(bedTable.brokenBedTeam.id)]
-        local teamname = team and team.displayName:lower() or "unknown"
-        local message = getNotificationMessage({}, "You have destroyed <bed>'s bed", "<bed>", teamname)
-        Action("EventNotifier", message, 7)
-    end
-end
-
-local function handleEntityDeathEvent(deathTable, lplr, DeathMessage, FinalKillMessage)
-    local killer = playersService:GetPlayerFromCharacter(deathTable.fromEntity)
-    local killed = playersService:GetPlayerFromCharacter(deathTable.entityInstance)
-    
-    if not killed or not killer then return end
-    
-    if deathTable.finalKill then
-        if killed == lplr and killer ~= lplr then
-            local message = getNotificationMessage({}, "You have lost to <name>. Good game.", "<name>", killer.DisplayName)
-            warningNotification("EventNotifier", message, 7)
-        elseif killer == lplr then
-            local message = getNotificationMessage({}, "You've defeated <name>!", "<name>", killed.DisplayName)
-            warningNotification("EventNotifier", message, 7)
-        end
-    else
-        if deathTable.fromEntity == lplr.Character and deathTable.entityInstance ~= lplr.Character then
-            local message = getNotificationMessage({}, "You have killed <name>.", "<name>", killed.DisplayName)
-            warningNotification("EventNotifier", message, 7)
-        end
-    end
-end
-
-local function handleMatchEndEvent(winstuff, lplr)
-    local myTeam = bedwars.ClientStoreHandler:getState().Game.myTeam
-    if myTeam and myTeam.id == winstuff.winningTeamId then
-        InfoNotification("EventNotifier", "You've won the game! gg", 60)
-    end
-end
-
-local function handleBedShieldEndEvent()
-    warningNotification("EventNotifier", "Bed shields are down.", 7)
-end
-
-local function initializeNotifications(notifications, lplr)
-    notifications = utility.Api.CreateOptionsButton({ -- thank you salad
-        Name = "EventNotifier",
-        Function = function(notified)
-            if notified then
-                task.spawn(function()
-                    table.insert(notifications.Connections, vapeEvents.BedwarsBedBreak.Event:Connect(function(bedTable)
-                        handleBedBreakEvent(bedTable, lplr)
-                    end))
-
-                    table.insert(notifications.Connections, vapeEvents.EntityDeathEvent.Event:Connect(function(deathTable)
-                        handleEntityDeathEvent(deathTable, lplr)
-                    end))
-                    
-                    table.insert(notifications.Connections, vapeEvents.MatchEndEvent.Event:Connect(function(winstuff)
-                        handleMatchEndEvent(winstuff, lplr)
-                    end))
-
-                    table.insert(notifications.Connections, vapeEvents.BedShieldsEnd.Event:Connect(handleBedShieldEndEvent))
-                end)
-            end
-        end,
-        HoverText = "This module will notify you on specific events\ni looked at voidware's code for some lines of code\nso credits to Blanked Void",
-		ExtraText = function() return "UselessModule" end
-    })
-
-    local toggles = {
-        {"Final Kill Notifier", "Notifies you when you final kill someone (he wont be able to respawn)"},
-        {"No Bed Notifier", "Notifies you when your bed gets destroyed by someone"},
-        {"Player Death Notifier", "Notifies you when you pass away (with cheats lmao)"},
-        {"Bed Destroyer Notifier", "Notifies when you destroy a team's bed."},
-        {"Kills Notifier", "Notifies when you kill someone."},
-        {"Game Won Notifier", "Notifies you when you win the game."},
-        {"End Of Bed Protection", "Notifies you when bed shields end."}
-    }
-
-    for _, toggle in ipairs(toggles) do
-        notifications.CreateToggle({
-            Name = toggle[1],
-            Function = function() end,
-            Default = true,
-            HoverText = toggle[2]
-        })
-    end
-end
-
 run(function()
-    local lplr = game.Players.LocalPlayer 
-    local notifications = {Connections = {}}
-    initializeNotifications(notifications, lplr)
-end)
---[[run(function()
-  local fuckyoustav = exploit.Api.CreateOptionsButton({
-    Name = "LagbackReplacer",
-    Function = function(calling)
-      if calling then
-task.spawn(function()
-                    local heartbeat = game:GetService("RunService").Heartbeat
-                    local lplr = game:GetService("Players").LocalPlayer
+    local Bypass = {Enabled = false}
+    local scythe = {Enabled = true}
+    local BypassMethod = {Value = "LookVector + MoveDirection"}
+    local bticks = 0
+    local direction
 
-                    while Callback do
-                        heartbeat:Wait()
+    Bypass = exploit.Api.CreateOptionsButton({
+        Name = "ScytheDisabler [FIXED]",
+        Function = function(callback)
+            if callback then
+                RunLoops:BindToStepped("Bypass", function()
+                    if scythe.Enabled then
+                        local item = getItemNear("scythe")
+                        if item then
+                            switchItem(item.tool)
+                            bticks = bticks + 1
 
-                        local scythe = getScytheInInventory(lplr)
-                        if scythe then
-                            lplr.Character.HandInvItem.Value = scythe.Name
-                            lplr.Character.HumanoidRootPart.Velocity = Vector3.new(0, -math.huge, 0)
-                            lplr.Character.Humanoid.WalkSpeed = math.huge -- Bypass speed check
-
-                            for _, descendant in ipairs(lplr.Character:GetDescendants()) do
-                                if descendant:IsA("BasePart") then
-                                    descendant.Velocity = Vector3.new(0, 0, 0)
-                                    descendant.CanCollide = false
+                            if entityLibrary.isAlive then
+                                if bticks >= 50 then
+                                    sethiddenproperty(entityLibrary.character.HumanoidRootPart, "NetworkIsSleeping", false)
+                                    bticks = 0
+                                else
+                                    sethiddenproperty(entityLibrary.character.HumanoidRootPart, "NetworkIsSleeping", true)
                                 end
                             end
+
+                            if BypassMethod.Value == "LookVector" then
+                                direction = entityLibrary.character.HumanoidRootPart.CFrame.LookVector
+                            elseif BypassMethod.Value == "MoveDirection" then
+                                direction = entityLibrary.character.Humanoid.MoveDirection
+                            elseif BypassMethod.Value == "LookVector + MoveDirection" then
+                                direction = entityLibrary.character.HumanoidRootPart.CFrame.LookVector + entityLibrary.character.Humanoid.MoveDirection
+                            end
+
+                            bedwars.Client:Get("ScytheDash"):SendToServer({direction = direction})
                         end
                     end
                 end)
+            else
+                RunLoops:UnbindFromStepped("Bypass")
+                sethiddenproperty(entityLibrary.character.HumanoidRootPart, "NetworkIsSleeping", false)
             end
         end,
-      
-  })    
-end)--]]  
-run(function()
-  local ihopethepersonwhopatchedscythedisablercommitsssuicide = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
-    Name = 'AnticheatBypass',
-    Function = function(call)
-      if call then
-          end
-    end
- })
- ZephyrSpeed = ihopethepersonwhopatchedscythedisablercommitsssuicide.CreateSlider({
-    Name = "Zephyr Speed",
-    Min = 1,
-    Max = 32,
-    Function = function(val) end,
-    Default = 28
-})
-GrappleSpeed = ihopethepersonwhopatchedscythedisablercommitsssuicide.CreateSlider({
-    Name = "Grapple Disabler Speed",
-    Min = 1,
-    Max = 150,
-    Function = function(val) end,
-    Default = 90
-})
-end)
-run(function()
-	local Bypass = {Enabled = false}
-	local scythe = {Enabled = true}
-	local BypassMethod = {Value = "LookVector + MoveDirection"}
-	local bticks = 0
-	local direction
-	local antilagback = {Enabled = true}
-
-	Bypass = exploit.Api.CreateOptionsButton({
-		Name = "ScytheDisabler [FIXED]",
-		Function = function(callback)
-			if callback then
-				RunLoops:BindToStepped("Bypass", function()
-					if scythe.Enabled then
-						local item = getItemNear("scythe")
-						if item then
-							switchItem(item.tool)
-							bticks = bticks + 1
-							if entityLibrary.isAlive then
-								if bticks >= 50 then
-									sethiddenproperty(entityLibrary.character.HumanoidRootPart, "NetworkIsSleeping", false)
-									bticks = 0
-								else
-									sethiddenproperty(entityLibrary.character.HumanoidRootPart, "NetworkIsSleeping", true)
-								end
-							end
-							
-							if BypassMethod.Value == "LookVector" then
-								direction = entityLibrary.character.HumanoidRootPart.CFrame.LookVector
-							elseif BypassMethod.Value == "MoveDirection" then
-								direction = entityLibrary.character.Humanoid.MoveDirection
-							elseif BypassMethod.Value == "LookVector + MoveDirection" then
-								direction = entityLibrary.character.HumanoidRootPart.CFrame.LookVector + entityLibrary.character.Humanoid.MoveDirection
-							end
-
-							bedwars.Client:Get("ScytheDash"):SendToServer({direction = direction})
-						end
-					end
-					
-					if antilagback.Enabled then
-						task.spawn(function()
-							repeat
-								local heartbeat = game:GetService("RunService").Heartbeat
-								local lplr = game:GetService("Players").LocalPlayer
-								heartbeat:Wait()
-
-								local scythe = getScytheInInventory(lplr)
-								if scythe then
-									lplr.Character.HandInvItem.Value = scythe.Name
-									lplr.Character.HumanoidRootPart.Velocity = Vector3.new(0, -math.huge, 0)
-									lplr.Character.Humanoid.WalkSpeed = math.huge 
-
-									for _, descendant in ipairs(lplr.Character:GetDescendants()) do
-										if descendant:IsA("BasePart") then
-											descendant.Velocity = Vector3.new(0, 0, 0)
-											descendant.CanCollide = false
-										end
-									end
-								end
-							until not callback
-						end)
-					end
-				end)
-			else
-				RunLoops:UnbindFromStepped("Bypass")
-				sethiddenproperty(entityLibrary.character.HumanoidRootPart, "NetworkIsSleeping", false)
-			end
-		end,
-		HoverText = "Helps bypass the AntiCheat"
-	})
-
-	scythe = Bypass.CreateToggle({
-		Name = "Scythe",
-		Default = true,
-		Function = function() end
-	})
-
-	BypassMethod = Bypass.CreateDropdown({
-		Name = "Scythe Direction Mode",
-		List = {"LookVector", "MoveDirection", "LookVector + MoveDirection"},
-		Function = function() end
-	})
-
-	antilagback = Bypass.CreateToggle({
-		Name = "Anti Lagback",
-		Default = true,
-		Function = function() end
-	})
-end)
-
-run(function()
-  local selfreset = utility.Api.CreateOptionsButton({
-    Name = "SelfReset",
-    Function = function(callback)
-      if callback then
-        lplr.Character.Humanoid.Health = 0
-
-        repeat
-          wait()
-        until not selfreset.Enabled
-      end
-    end
-  })
-end)
-run(function()
-    local gravityfly = blatant.Api.CreateOptionsButton({
-        Name = 'GravityFly',
-        Function = function(calling)
-            if calling then
-                game.Workspace.Gravity = 0
-            else
-                game.Workspace.Gravity = 196.2
-            end
-        end
+        HoverText = "Helps bypass the AntiCheat"
     })
-end)
+
+    scythe = Bypass.CreateToggle({
+        Name = "Scythe",
+        Default = true,
+        Function = function() end
+    })
+
+    BypassMethod = Bypass.CreateDropdown({
+        Name = "Scythe Direction Mode",
+        List = {"LookVector", "MoveDirection", "LookVector + MoveDirection"},
+        Function = function() end
+    })
+
+    ZephyrSpeed = Bypass.CreateSlider({
+        Name = "Zephyr Speed",
+        Min = 1,
+        Max = 32,
+        Function = function(val) end,
+        Default = 28
+    })
+
+    GrappleSpeed = Bypass.CreateSlider({
+        Name = "Grapple Disabler Speed",
+        Min = 1,
+        Max = 150,
+        Function = function(val) end,
+        Default = 90
+    })
+end)    
 
 run(function()
-	local KaidaInstaKill = {Enabled = false}
-	local Range = {Value = 40}
-	local MaxEntities = {Value = 1}
-	KaidaInstaKill = GuiLibrary.ObjectsThatCanBeSaved.ExploitWindow.Api.CreateOptionsButton({
-		Name = "KaidaInstaKill",
-		Function = function(call) 
-			if call then
-				if store.queueType ~= "training_room" and store.equippedKit ~= "summoner" then warningNotification("KaidaInstakill", "Kaida kit is required!", 1.5); return KaidaInstaKill.ToggleButton(false); end
-				local npcsortmethods = {
-					Distance = function(a, b)
-						local check1 = a.HumanoidRootPart
-						local check2 = b.HumanoidRootPart
-						if a:FindFirstChild("RootPart") then check1 = a.RootPart end
-						if b:FindFirstChild("RootPart") then check2 = b.RootPart end
-						return (check1.Position - entityLibrary.character.HumanoidRootPart.Position).Magnitude < (check2.Position - entityLibrary.character.HumanoidRootPart.Position).Magnitude
-					end
-				}
-				local function sendRequest(entity)
-					local targetPosition = entity.HumanoidRootPart.Position
-					local direction = (targetPosition - lplr.Character.HumanoidRootPart.Position).unit
-					local args = {
-						[1] = {
-							["clientTime"] = tick(),
-							["direction"] = direction,
-							["position"] = targetPosition
-						}
-					}
-					return game:GetService("ReplicatedStorage").rbxts_include.node_modules:FindFirstChild("@rbxts").net.out._NetManaged.SummonerClawAttackRequest:FireServer(unpack(args))
-				end
-				repeat task.wait();
-					if entityLibrary.isAlive and store.matchState > 0 then
-						local res = AllNearPosition(Range.Value, MaxEntities.Value, npcsortmethods["Distance"], nil, true)
-						for i,v in pairs(res) do
-							local req_res = sendRequest(v)
-						end
-					end
-				until (not KaidaInstaKill.Enabled)
-			end
-		end
-	})
-	Range = KaidaInstaKill.CreateSlider({
-		Name = "Aura Range",
-		Min = 30,
-		Max = 50,
-		Function = function(val) end,
-		Default = 50
-	})
-	MaxEntities = KaidaInstaKill.CreateSlider({
-		Name = "Max Entities",
-		Min = 10,
-		Max = 15,
-		Function = function(val) end,
-		Default = 10,
-		HoverText = "Max entities to attack \n at the same time"
-	})
-end)
+    local KaidaInstaKill = {Enabled = false}
+    local Range = {Value = 40}
+    local MaxEntities = {Value = 1}
 
+    local function npcsortDistance(a, b)
+        local check1 = a.HumanoidRootPart
+        local check2 = b.HumanoidRootPart
+        if a:FindFirstChild("RootPart") then check1 = a.RootPart end
+        if b:FindFirstChild("RootPart") then check2 = b.RootPart end
+        return (check1.Position - entityLibrary.character.HumanoidRootPart.Position).Magnitude < (check2.Position - entityLibrary.character.HumanoidRootPart.Position).Magnitude
+    end
 
+    local function sendRequest(entity)
+        local targetPosition = entity.HumanoidRootPart.Position
+        local direction = (targetPosition - lplr.Character.HumanoidRootPart.Position).Unit
+        local args = {
+            [1] = {
+                clientTime = tick(),
+                direction = direction,
+                position = targetPosition
+            }
+        }
+        return game:GetService("ReplicatedStorage").rbxts_include.node_modules:FindFirstChild("@rbxts").net.out._NetManaged.SummonerClawAttackRequest:FireServer(unpack(args))
+    end
 
-run(function()
-    if (not game:IsLoaded()) then game.Loaded:Wait() end
-    local IndicatorMessages = {
-        "Spooked!";
-        "Boo!";
-        "Haunted!";
-        "Cursed!";
-        "Screech!";
-        "Slash!";
-        "Ghoul Strike!";
-        "Fright!";
-        "Spine Chill!";
-        "Pumpkin Smash!";
-    }
-    local IndicatorColor = {
-        Color3.new(1, 0.549, 0);
-        Color3.new(0.5, 0, 0.5);
-        Color3.new(0, 0, 0);
-        Color3.new(1, 0, 0);
-        Color3.new(0.3, 0.2, 0.2);
-    }
-
-    local DamageIndicator
-    DamageIndicator = GuiLibrary["ObjectsThatCanBeSaved"]["RenderWindow"]["Api"]["CreateOptionsButton"]({
-        ["Name"] = "DamageIndicator",
-        ["HoverText"] = "Changes the regular indicator text",
-        ["Function"] = function(callback)
-            if callback then 
-                workspace.ChildAdded:Connect(function(Child)
-                    if (Child:IsA("Part") and Child.Name == "DamageIndicatorPart") then
-                        local _Message = IndicatorMessages[math.random(1, #IndicatorMessages)];
-                        local _Color = IndicatorColor[math.random(1, #IndicatorColor)];
-                
-                        Child.BillboardGui.Frame.TextLabel.Text = _Message
-                        Child.BillboardGui.Frame.TextLabel.TextColor3 = _Color
+    KaidaInstaKill = GuiLibrary.ObjectsThatCanBeSaved.ExploitWindow.Api.CreateOptionsButton({
+        Name = "KaidaInstaKill",
+        Function = function(call) 
+            if call then
+                if store.queueType ~= "training_room" and store.equippedKit ~= "summoner" then 
+                    warningNotification("KaidaInstakill", "Kaida kit is required!", 1.5)
+                    return KaidaInstaKill.ToggleButton(false)
+                end
+                task.spawn(function()
+                    while KaidaInstaKill.Enabled do
+                        if entityLibrary.isAlive and store.matchState > 0 then
+                            local res = AllNearPosition(Range.Value, MaxEntities.Value, npcsortDistance, nil, true)
+                            for _, v in pairs(res) do
+                                sendRequest(v)
+                            end
+                        end
+                        task.wait()
                     end
                 end)
             end
         end
     })
+
+    Range = KaidaInstaKill.CreateSlider({
+        Name = "Aura Range",
+        Min = 30,
+        Max = 50,
+        Function = function(val) end,
+        Default = 50
+    })
+
+    MaxEntities = KaidaInstaKill.CreateSlider({
+        Name = "Max Entities",
+        Min = 10,
+        Max = 15,
+        Function = function(val) end,
+        Default = 10,
+        HoverText = "Max entities to attack \n at the same time"
+    })
 end)
-local anchorchar = function(bool)
-    for i, v in pairs(players:GetPlayers()) do
-        if v ~= lplr and isAlive(v) then
-            v.Character.PrimaryPart.Anchored = bool
-        end
-    end
-end
+
 
 run(function()
-    local BackTrack = {}
-    BackTrack = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
-        Name = "BackTrack",
-        HoverText = "BackTrack",
+    if not game:IsLoaded() then game.Loaded:Wait() end
+
+    local IndicatorMessages = {
+        "Spooked!", "Boo!", "Haunted!", "Cursed!", "Screech!",
+        "Slash!", "Ghoul Strike!", "Fright!", "Spine Chill!", "Pumpkin Smash!"
+    }
+
+    local IndicatorColors = {
+        Color3.new(1, 0.549, 0),
+        Color3.new(0.5, 0, 0.5),
+        Color3.new(0, 0, 0),
+        Color3.new(1, 0, 0),
+        Color3.new(0.3, 0.2, 0.2)
+    }
+
+    local function modifyDamageIndicator(child)
+        if child:IsA("Part") and child.Name == "DamageIndicatorPart" then
+            local message = IndicatorMessages[math.random(#IndicatorMessages)]
+            local color = IndicatorColors[math.random(#IndicatorColors)]
+            
+            child.BillboardGui.Frame.TextLabel.Text = message
+            child.BillboardGui.Frame.TextLabel.TextColor3 = color
+        end
+    end
+
+    local DamageIndicator = GuiLibrary.ObjectsThatCanBeSaved.RenderWindow.Api.CreateOptionsButton({
+        Name = "DamageIndicator",
+        HoverText = "Changes the regular indicator text",
         Function = function(callback)
             if callback then 
-                local lastUpdate = tick()
-                local delay = 0.3
-                repeat
-                    local currentTime = tick()
-                    if (currentTime - lastUpdate) > delay then
-                        anchorchar(true)
-                        lastUpdate = currentTime
-                        task.wait(delay)
-                    end
-                    anchorchar(false)
-                    task.wait(0)
-                until not BackTrack.Enabled
+                workspace.ChildAdded:Connect(modifyDamageIndicator)
             end
         end
     })
 end)
 
+run(function()
+    local players = game:GetService("Players")
+    local lplr = players.LocalPlayer
+
+    local function isAlive(player)
+        return player.Character and player.Character:FindFirstChild("Humanoid") 
+            and player.Character.Humanoid.Health > 0
+    end
+
+    local function anchorChar(bool)
+        if isAlive(lplr) and lplr.Character.PrimaryPart then
+            lplr.Character.PrimaryPart.Anchored = bool
+        end
+    end
+
+    local BackTrack = {}
+    BackTrack = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
+        Name = "BackTrack",
+        HoverText = "Temporarily anchors your character",
+        Function = function(callback)
+            if callback then 
+                task.spawn(function()
+                    local anchorDuration = 0.3
+                    local cooldownDuration = 0.1
+                    while BackTrack.Enabled do
+                        anchorChar(true)
+                        task.wait(anchorDuration)
+                        anchorChar(false)
+                        task.wait(cooldownDuration)
+                    end
+                end)
+            else
+                anchorChar(false)
+            end
+        end
+    })
+end)
 run(function()
 	local TweenService = game:GetService("TweenService")
 	local playersService = game:GetService("Players")
@@ -12157,57 +11858,8 @@ run(function()
 	visualrootcolor.Object.Visible = false
 end)
 
-run(function()
-  local montisnevergoingtobeabletodosmallshitevenlikethis = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
-    Name = 'Developer Console Destroyer',
-    Function = function(callback)
-      if callback then
-        repeat
-          warningNotification('Vape', 'Successfully destroyed it, type /console for more info', '2')
-          for i = 1, 100 do
-            print('this is a stupid little project using print')
-            wait(0.01)
-          end
-          wait(1)
-        until not montisnevergoingtobeabletodosmallshitevenlikethis.Enabled
-      end
-    end
-  })
-end)
-function donotification()
-  for i = 1, 100 do
-    warningNotification('notification spammer', 'flow me beast fiend', '2')
-  end
-end
 
-run(function()
-  local flowsaidicandothisj = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
-    Name = 'notification spammer',
-    Function = function(callback)
-      if callback then
-        repeat
-          donotification()
-        until not flowsaidicandothisj.Enabled
-      end
-    end
-  })
-end)
-function dothecrashahahssjja()
-    while true do end
-end
 
-run(function()
-    local idkwhatimdoinga = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
-        Name = 'SelfCrash',
-        Function = function(callback)
-            if callback then
-                pcall(function()
-                    dothecrashahahssjja()  
-                end)
-            end
-        end
-    })
-end)
 run(function()
     local boostjump = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
         Name = 'BoostJump',
@@ -12226,9 +11878,9 @@ run(function()
     blacks = boostjump.CreateSlider({
         Name = "Value",
         Min = 1,
-        Max = 10000000000,
+        Max = 500,
         Function = function(val) end,
-        Default = 1000
+        Default = 500
     })
 end)
 run(function() 
@@ -12980,113 +12632,135 @@ end)
 
 
 run(function()
-	local HannahExploit = {Enabled = false}
-	HannahExploit = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
-		Name = "HannahAura",
-		Function = function(callback)
-			if callback then
-				RunLoops:BindToHeartbeat("hannah",function()
-					for i,v in pairs(game.Players:GetChildren()) do
-						local args = {
-							[1] = {
-								["user"] = game:GetService("Players").LocalPlayer,
-								["victimEntity"] = v.Character
-							}
-						}
-	
-						game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("HannahPromptTrigger"):InvokeServer(unpack(args))
-					end
-				end)
-			else
-				RunLoops:UnbindFromHeartbeat("hannah")
-			end
-		end,
-		HovorText = "Sometimes you will teleport across the map with Hannah"
-	})
-end)
-run(function()
-    local SpiderBypass = {Enabled = false}
-    SpiderBypass = blatant.Api.CreateOptionsButton({
-        Name = "FreezeAura",
-        Function = function(calling)
-            if calling then
-                task.spawn(function()
-                    repeat task.wait()
-                        local scaleX = 3
-                        local scaleY = 3.18
-                        local scaleZ = 3.006
-                        local maxDistance = 10
+    local HannahExploit = {Enabled = false}
 
-                        local function getNearestPlayer()
-                            local players = game.Players:GetPlayers()
-                            local localPlayer = game.Players.LocalPlayer
-                            local nearestPlayer = nil
-                            local nearestDistance = maxDistance
+    local function triggerHannahPrompt(player)
+        local args = {
+            [1] = {
+                ["user"] = game:GetService("Players").LocalPlayer,
+                ["victimEntity"] = player.Character
+            }
+        }
 
-                            for _, player in ipairs(players) do
-                                if player ~= localPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                                    local distance = (player.Character.HumanoidRootPart.Position - localPlayer.Character.HumanoidRootPart.Position).magnitude
-                                    if distance < nearestDistance then
-                                        nearestDistance = distance
-                                        nearestPlayer = player
-                                    end
-                                end
-                            end
+        local hannahPromptTrigger = game:GetService("ReplicatedStorage")
+            :WaitForChild("rbxts_include")
+            :WaitForChild("node_modules")
+            :WaitForChild("@rbxts")
+            :WaitForChild("net")
+            :WaitForChild("out")
+            :WaitForChild("_NetManaged")
+            :WaitForChild("HannahPromptTrigger")
 
-                            return nearestPlayer and nearestPlayer.Character.HumanoidRootPart.Position or nil
-                        end
+        hannahPromptTrigger:InvokeServer(unpack(args))
+    end
 
-                        while true do
-                            local targetPosition = getNearestPlayer()
-                            if targetPosition then
-                                local args = {
-                                    [1] = "spider_queen_web_bridge_fire",
-                                    [2] = {
-                                        ["direction"] = (targetPosition - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).unit,
-                                        ["scale"] = Vector3.new(scaleX, scaleY, scaleZ)
-                                    }
-                                }
-
-                                local remote = game:GetService("ReplicatedStorage"):WaitForChild("events-@easy-games/game-core:shared/game-core-networking@getEvents.Events"):WaitForChild("useAbility")
-                                remote:FireServer(unpack(args))
-                                print("FreezeAura realllll")
-                            end
-                            task.wait(0.01)
-                        end
-                    until not SpiderBypass.Enabled
-                end)
+    local function hannahAuraLoop()
+        for _, player in ipairs(game.Players:GetChildren()) do
+            if player ~= game.Players.LocalPlayer and player.Character then
+                triggerHannahPrompt(player)
             end
         end
+    end
+
+    HannahExploit = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
+        Name = "HannahAura",
+        Function = function(callback)
+            HannahExploit.Enabled = callback
+            if callback then
+                RunLoops:BindToHeartbeat("hannah", hannahAuraLoop)
+            else
+                RunLoops:UnbindFromHeartbeat("hannah")
+            end
+        end,
+        HoverText = "Sometimes you will teleport across the map with Hannah"
     })
 end)
 run(function()
-  local spiderSummonButton
-  local running = false
+    local SpiderBypass = {Enabled = false}
+    
+    local function getNearestPlayer(maxDistance)
+        local localPlayer = game.Players.LocalPlayer
+        local nearestPlayer, nearestDistance = nil, maxDistance
 
-  local function summonSpiders()
-    local args = {
-      [1] = "spider_queen_summon_spiders"
-    }
-
-    game:GetService("ReplicatedStorage"):FindFirstChild("events-@easy-games/game-core:shared/game-core-networking@getEvents.Events").useAbility:FireServer(unpack(args))
-  end
-
-  spiderSummonButton = blatant.Api.CreateOptionsButton({
-    Name = 'SpiderExploit',
-    Function = function(calling)
-      if calling then
-        if not running then
-          running = true
-          task.spawn(function()
-            while running do
-              summonSpiders()
-              task.wait(0.1)  
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            if player ~= localPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local distance = (player.Character.HumanoidRootPart.Position - localPlayer.Character.HumanoidRootPart.Position).Magnitude
+                if distance < nearestDistance then
+                    nearestPlayer, nearestDistance = player, distance
+                end
             end
-          end)
         end
-      else
-        running = false
-      end
+
+        return nearestPlayer and nearestPlayer.Character.HumanoidRootPart.Position
     end
-  })
+
+    local function fireWebBridge(targetPosition)
+        local localPlayer = game.Players.LocalPlayer
+        local direction = (targetPosition - localPlayer.Character.HumanoidRootPart.Position).Unit
+        local scale = Vector3.new(3, 3.18, 3.006)
+
+        local args = {
+            [1] = "spider_queen_web_bridge_fire",
+            [2] = {
+                ["direction"] = direction,
+                ["scale"] = scale
+            }
+        }
+
+        local remote = game:GetService("ReplicatedStorage"):WaitForChild("events-@easy-games/game-core:shared/game-core-networking@getEvents.Events"):WaitForChild("useAbility")
+        remote:FireServer(unpack(args))
+    end
+
+    local function freezeAuraLoop()
+        while SpiderBypass.Enabled do
+            local targetPosition = getNearestPlayer(10)
+            if targetPosition then
+                fireWebBridge(targetPosition)
+                print("FreezeAura activated")
+            end
+            task.wait(0.01)
+        end
+    end
+
+    SpiderBypass = blatant.Api.CreateOptionsButton({
+        Name = "FreezeAura",
+        Function = function(calling)
+            SpiderBypass.Enabled = calling
+            if calling then
+                task.spawn(freezeAuraLoop)
+            end
+        end,
+        HoverText = "Automatically fires web bridges at nearby players"
+    })
+end)
+
+run(function()
+    local spiderthing
+
+    local function summonspiders()
+        local args = {"spider_queen_summon_spiders"}
+        local replicatedStorage = game:GetService("ReplicatedStorage")
+        local events = replicatedStorage:FindFirstChild("events-@easy-games/game-core:shared/game-core-networking@getEvents.Events")
+
+        if events then
+            events.useAbility:FireServer(unpack(args))
+        else
+            warn("Events not found in ReplicatedStorage.")
+        end
+    end
+
+    spiderthing = blatant.Api.CreateOptionsButton({
+        Name = 'SpiderExploit',
+        Function = function(calling)
+            if calling then
+                task.spawn(function()
+                    repeat
+                        summonspiders()
+                        task.wait(0.1)
+                    until not spiderthing.Enabled
+                end)
+            end
+        end,
+        HoverText = "Automatically summons spiders"
+    })
 end)
