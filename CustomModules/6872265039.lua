@@ -1,3 +1,4 @@
+--This watermark is used to delete the file if its cached, remove it to make the file persist after commits.
 --[[
 	Credits
 	Infinite Yield - Blink
@@ -149,6 +150,14 @@ end
 local function runcode(func)
 	func()
 end
+local function run(func)
+	func()
+end
+local function runFunction(func)
+	func()
+end
+
+
 
 local function betterfind(tab, obj)
 	for i,v in pairs(tab) do
@@ -292,6 +301,13 @@ local function friendCheck(plr, recolor)
 	return nil
 end
 
+local combat = GuiLibrary.ObjectsThatCanBeSaved.CombatWindow
+local blatant = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow
+local visual = GuiLibrary.ObjectsThatCanBeSaved.RenderWindow
+local exploit = GuiLibrary.ObjectsThatCanBeSaved.ExploitWindow
+local utility = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow
+local world = GuiLibrary.ObjectsThatCanBeSaved.WorldWindow
+
 GuiLibrary["RemoveObject"]("SilentAimOptionsButton")
 GuiLibrary["RemoveObject"]("AutoClickerOptionsButton")
 GuiLibrary["RemoveObject"]("MouseTPOptionsButton")
@@ -315,7 +331,7 @@ teleportfunc = lplr.OnTeleport:Connect(function(State)
 end)
 
 local Sprint = {["Enabled"] = false}
-Sprint = GuiLibrary["ObjectsThatCanBeSaved"]["CombatWindow"]["Api"].CreateOptionsButton({
+Sprint = combat.Api.CreateOptionsButton({
 	["Name"] = "Sprint",
 	["Function"] = function(callback)
 		if callback then
@@ -354,7 +370,7 @@ runcode(function()
 
 	local flytog = false
 	local flytogtick = tick()
-	fly = GuiLibrary["ObjectsThatCanBeSaved"]["BlatantWindow"]["Api"].CreateOptionsButton({
+	fly = blatant.Api.CreateOptionsButton({
 		["Name"] = "Fly",
 		["Function"] = function(callback)
 			if callback then
@@ -439,7 +455,7 @@ local JoinQueue = {["Enabled"] = false}
 local JoinQueueTypes = {["Value"] = ""}
 local JoinQueueDelay = {["Value"] = 1}
 local firstqueue = true
-JoinQueue = GuiLibrary["ObjectsThatCanBeSaved"]["BlatantWindow"]["Api"].CreateOptionsButton({
+JoinQueue = blatant.Api.CreateOptionsButton({
 	["Name"] = "AutoQueue",
 	["Function"] = function(callback)
 		if callback then
@@ -535,7 +551,7 @@ runcode(function()
 		ownedkitsamount = ownedkitsamount + 1
 		ownedkits[bedwars["KitMeta"][v3.kitType].name:lower()] = v3.kitType
 	end
-	AutoKit = GuiLibrary["ObjectsThatCanBeSaved"]["UtilityWindow"]["Api"].CreateOptionsButton({
+	AutoKit = utility.Api.CreateOptionsButton({
 		["Name"] = "AutoKit",
 		["Function"] = function(callback)
 			if callback then
@@ -580,7 +596,7 @@ end)
 
 runcode(function()
 	local CameraFix = {["Enabled"] = false}
-	CameraFix = GuiLibrary["ObjectsThatCanBeSaved"]["RenderWindow"]["Api"].CreateOptionsButton({
+	CameraFix = visual.Api.CreateOptionsButton({
 		["Name"] = "CameraFix",
 		["Function"] = function(callback)
 			if callback then
@@ -612,7 +628,7 @@ runcode(function()
 	local speedtick = tick()
 	local bodyvelo
 	local raycastparameters = RaycastParams.new()
-	speed = GuiLibrary["ObjectsThatCanBeSaved"]["BlatantWindow"]["Api"].CreateOptionsButton({
+	speed = blatant.Api.CreateOptionsButton({
 		["Name"] = "Speed",
 		["Function"] = function(callback)
 			if callback then
@@ -1197,7 +1213,7 @@ runcode(function()
 		end
 	}
 
-	OldBedwars = GuiLibrary["ObjectsThatCanBeSaved"]["RenderWindow"]["Api"].CreateOptionsButton({
+	OldBedwars = visual.Api.CreateOptionsButton({
 		["Name"] = "GameTheme",
 		["Function"] = function(callback)
 			if callback then
@@ -1221,6 +1237,97 @@ runcode(function()
 		["List"] = {"Old", "Winter", "Halloween", "Valentines"}
 	})
 end)
+runcode(function()
+	local QueueCardMods = {}
+	local QueueCardGradientToggle = {}
+	local QueueCardGradient = {Hue = 0, Sat = 0, Value = 0}
+	local QueueCardGradient2 = {Hue = 0, Sat = 0, Value = 0}
+	local queuemodsgradients = {}
+	
+	local function patchQueueCard()
+		if lplr.PlayerGui:FindFirstChild('QueueApp') then 
+			if lplr.PlayerGui.QueueApp:WaitForChild('1'):IsA('Frame') then 
+				lplr.PlayerGui.QueueApp['1'].BackgroundColor3 = Color3.fromHSV(QueueCardGradient.Hue, QueueCardGradient.Sat, QueueCardGradient.Value)
+			end
+			if QueueCardGradientToggle.Enabled then 
+				lplr.PlayerGui.QueueApp['1'].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				local gradient = (lplr.PlayerGui.QueueApp['1']:FindFirstChildWhichIsA('UIGradient') or Instance.new('UIGradient', lplr.PlayerGui.QueueApp['1']))
+				gradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHSV(QueueCardGradient.Hue, QueueCardGradient.Sat, QueueCardGradient.Value)), ColorSequenceKeypoint.new(1, Color3.fromHSV(QueueCardGradient2.Hue, QueueCardGradient2.Sat, QueueCardGradient2.Value))})
+				table.insert(queuemodsgradients, gradient)
+			end
+		end
+	end
+	
+	QueueCardMods = visual.Api.CreateOptionsButton({
+		Name = 'QueueCardMods',
+		HoverText = 'Mods the QueueApp at the end of the game.',
+		Function = function(calling) 
+			if calling then 
+				patchQueueCard()
+				table.insert(QueueCardMods.Connections, lplr.PlayerGui.ChildAdded:Connect(patchQueueCard))
+			end
+		end
+	})
+	
+	QueueCardGradientToggle = QueueCardMods.CreateToggle({
+		Name = 'Gradient',
+		Function = function(calling)
+			pcall(function() QueueCardGradient2.Object.Visible = calling end) 
+		end
+	})
+	
+	QueueCardGradient = QueueCardMods.CreateColorSlider({
+		Name = 'Color',
+		Function = function()
+			pcall(patchQueueCard)
+		end
+	})
+	
+	QueueCardGradient2 = QueueCardMods.CreateColorSlider({
+		Name = 'Color 2',
+		Function = function()
+			pcall(patchQueueCard)
+		end
+	})
+end)
+run(function()
+	local AutoCrate = {Enabled = false}
+	local aut = 0
+	
+	AutoCrate = utility.Api.CreateOptionsButton({
+		Name = "AutoCrate",
+		HovorText = "Automatically open crates if you have any.",
+		Function = function(callback)
+			if callback then
+				RunLoops:BindToStepped("crate",1,function()
+					aut = aut + 1
+					if aut >= 45 then
+						local args = {
+							[1] = {
+								["crateType"] = "level_up_crate",
+								["altarId"] = 0
+							}
+						}
+						
+						game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("RewardCrate/SpawnRewardCrate"):FireServer(unpack(args))
+						
+						local args2 = {
+							[1] = {
+								["crateId"] = tostring(game.Workspace.CrateAltar_0:FindFirstChild("RewardCrate"):GetAttribute("crateId"))
+							}
+						}
+						
+						game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("node_modules"):WaitForChild("@rbxts"):WaitForChild("net"):WaitForChild("out"):WaitForChild("_NetManaged"):WaitForChild("RewardCrate/OpenRewardCrate"):FireServer(unpack(args2))
+						aut = 0
+					end
+				end)
+			else
+				RunLoops:UnbindFromStepped("crate")
+			end
+		end
+	})
+end)
+
 
 runcode(function()
 	local tpstring = shared.vapeoverlay or nil
